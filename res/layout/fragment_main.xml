@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:maizer="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res/com.maizer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/darker_gray"
+    android:orientation="vertical" >
+
+    <ListView
+        android:id="@+id/listview"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:background="@android:color/white" >
+    </ListView>
+
+    <com.maizer.text.view.TextAreaView
+        android:id="@+id/t1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        app:compoundDrawable_Bottom="@drawable/ic_launcher"
+        app:compoundDrawable_Height="0.05"
+        app:compoundDrawable_Left="@drawable/logo"
+        app:compoundDrawable_Right="@drawable/logo"
+        app:compoundDrawable_Top="@drawable/ic_launcher"
+        app:compoundDrawable_Width="0.05"
+        android:paddingLeft="20dp"
+        app:gravity="center_vertical"
+        app:hint="@string/app_null"
+        app:hintColor="@android:color/holo_green_dark"
+        app:hintSize="13sp"
+        app:letterSpacing="20"
+        app:lineSpacing_Add="0"
+        app:lineSpacing_Mult="2"
+        app:maxLines_limitheight="-1"
+        app:textHighlightDrawable="@android:color/holo_green_dark"
+        app:textSize="13sp" />
+
+</LinearLayout>
