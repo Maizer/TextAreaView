@@ -1,3 +1,5 @@
+![image](https://github.com/Maizer/TextAreaView/blob/TextAreaView/TextAreaViewTest.gif ) 
+
 优点:  
 
 1>降低内耗,多行布局内存可降低1/1 - 1/3 之间,随文本大  - 小决定  
@@ -20,3 +22,4 @@
 
   
 由于TextView本身组件的复杂性,可能存在未知BUG,请谅解
+
