@@ -39,7 +39,8 @@ public class FormatLayout extends TextAreaLayout {
 
 	private static final String TAG = FormatLayout.class.getSimpleName();
 
-	private int waitTime = 2000;// wait 2 second
+	private static final int WAIT_TIME = 2000;// wait 2 second
+	
 	private PointSyncTask mSyncTask;
 	private PointArray mPoints;
 
@@ -48,23 +49,19 @@ public class FormatLayout extends TextAreaLayout {
 
 	private ObjectLinked<Lineable> mLinears;
 
-	public FormatLayout(LayoutAttribute attrubute, CharSequence text, TextAreaPaint wp, boolean startSyncTask) {
+	public FormatLayout(LayoutAttrubute attrubute, CharSequence text, TextAreaPaint wp, boolean startSyncTask) {
 		super(attrubute, wp, text);
 		mTempPaint = new TextAreaPaint();
 		mLinears = new ObjectLinked<Lineable>();
-		mMeasurer = getMeasurer(attrubute);
 		mPoints = new PointArray(attrubute.initLineArraySize, this);
+		mMeasurer = attrubute.build();
 		if (startSyncTask) {
-			mSyncTask = new PointSyncTask(waitTime, getMeasurer(attrubute));
+			mSyncTask = new PointSyncTask(WAIT_TIME, attrubute.build());
 		}
 		initgenerate();
 	}
 
-	private Measurer getMeasurer(LayoutAttribute attrubute) {
-		return attrubute.measureFactory.newMeasurer(attrubute);
-	}
-
-	protected void initgenerate() {
+	private void initgenerate() {
 		stopSyncTask();
 		CharSequence text = getText();
 		if (text == null || text.length() <= 0) {

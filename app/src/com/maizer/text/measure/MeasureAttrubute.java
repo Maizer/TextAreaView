@@ -6,7 +6,7 @@ import com.maizer.text.measure.Measurer.LineFormat;
 
 import android.text.TextUtils;
 
-public class MeasureAttribute {
+public abstract class MeasureAttrubute {
 	public static final String ELLIPSIS_NORMAL = "\u2026"; // this is "..."
 	public static final String ELLIPSIS_TWO_DOTS = "\u2025"; // this is ".."
 	public static final String ELLIPSIS_CENTER = "\u00b7\u00b7\u00b7";// this is
@@ -68,14 +68,14 @@ public class MeasureAttribute {
 	 */
 	public int initArraySize = 20;
 
-	public MeasureAttribute() {
+	public MeasureAttrubute() {
 	}
 
-	public MeasureAttribute(MeasureAttribute m) {
+	public MeasureAttrubute(MeasureAttrubute m) {
 		copy(m);
 	}
 
-	protected void copy(MeasureAttribute m) {
+	protected void copy(MeasureAttrubute m) {
 		lineFormat = m.lineFormat;
 		isIncludepad = m.isIncludepad;
 		isTrackpad = m.isTrackpad;
@@ -90,5 +90,6 @@ public class MeasureAttribute {
 		maxLinesLimitHeight = m.maxLinesLimitHeight;
 		initArraySize = m.initArraySize;
 	}
-
+	
+	public abstract Measurer build();
 }

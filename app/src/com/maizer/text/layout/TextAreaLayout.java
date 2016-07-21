@@ -7,7 +7,7 @@ import com.maizer.text.factory.EmojiFactory;
 import com.maizer.text.factory.LineFactory;
 import com.maizer.text.layout.TextAreaLayout.Alignment;
 import com.maizer.text.liner.Lineable;
-import com.maizer.text.measure.MeasureAttribute;
+import com.maizer.text.measure.MeasureAttrubute;
 import com.maizer.text.measure.Measurer;
 import com.maizer.text.util.ArrayGc;
 
@@ -42,16 +42,14 @@ public abstract class TextAreaLayout implements ArrayGc {
 	protected abstract Lineable getTextLiner(int raw);
 
 	/**
-	 * 获取当前显示的行数
-	 * get show lines in screen
+	 * 获取当前显示的行数 get show lines in screen
 	 * 
 	 * @return
 	 */
 	public abstract int getLineRecyleCount();
 
 	/**
-	 * 获取当前最大加载的行数
-	 * get max loaded lines 
+	 * 获取当前最大加载的行数 get max loaded lines
 	 * 
 	 * @return
 	 */
@@ -129,8 +127,7 @@ public abstract class TextAreaLayout implements ArrayGc {
 	public abstract void draw(Canvas c);
 
 	/**
-	 * 更新测量信息
-	 * update measure information
+	 * 更新测量信息 update measure information
 	 * 
 	 * @param index
 	 * @param helper
@@ -184,7 +181,7 @@ public abstract class TextAreaLayout implements ArrayGc {
 		}
 	}
 
-	private LayoutAttribute mAttribute;
+	private LayoutAttrubute mAttribute;
 	private CharSequence mText;
 	private TextAreaPaint mPaint;
 
@@ -195,9 +192,9 @@ public abstract class TextAreaLayout implements ArrayGc {
 	private boolean inLayout;
 	private boolean isSpanned;
 
-	protected TextAreaLayout(LayoutAttribute attrubute, TextAreaPaint wp, CharSequence text) {
+	protected TextAreaLayout(LayoutAttrubute attrubute, TextAreaPaint wp, CharSequence text) {
 		mAttribute = attrubute;
-		maxHeight = mAttribute.height;
+		maxHeight = attrubute.height;
 		mPaint = wp;
 		mText = text;
 		isSpanned = mText instanceof Spanned;
@@ -210,8 +207,8 @@ public abstract class TextAreaLayout implements ArrayGc {
 	public Drawable getTextHighlightDrawable() {
 		return mTextHighlightDrawable;
 	}
-	
-	public final LineFactory getLineFactory(){
+
+	public final LineFactory getLineFactory() {
 		return mAttribute.lineFactory;
 	}
 
@@ -220,9 +217,9 @@ public abstract class TextAreaLayout implements ArrayGc {
 		FontMetricsInt fm = getDefaultFontMetricsInt();
 		int below = fm.descent;
 		int above = fm.ascent;
-		int bottom = below-above;
+		int bottom = below - above;
 		int top = mFactory.computeLineTop(bottom, below, above);
-		return bottom-top;
+		return bottom - top;
 	}
 
 	public void setTextHighlightColor(int color) {
@@ -279,7 +276,7 @@ public abstract class TextAreaLayout implements ArrayGc {
 	}
 
 	/**
-	 * 检查与修正高度,通过{@link MeasureAttribute#maxLinesLimitHeight}配置
+	 * 检查与修正高度,通过{@link MeasureAttrubute#maxLinesLimitHeight}配置
 	 * 
 	 * @return 改变后的高
 	 */
@@ -459,7 +456,7 @@ public abstract class TextAreaLayout implements ArrayGc {
 	}
 
 	/**
-	 * 最大原始高度,>={@link LayoutAttribute#height}
+	 * 最大原始高度,>={@link LayoutBuilder#height}
 	 * 
 	 * @return max height
 	 */

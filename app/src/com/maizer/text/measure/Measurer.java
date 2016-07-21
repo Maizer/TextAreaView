@@ -4,7 +4,7 @@ import com.maizer.text.measure.LineMeasurer.TabStops;
 import com.maizer.text.util.ArrayGc;
 import com.maizer.text.util.ArrayUtils;
 import com.maizer.text.factory.LineFactory;
-import com.maizer.text.layout.LayoutAttribute;
+import com.maizer.text.layout.LayoutAttrubute;
 import com.maizer.text.layout.TextAreaLayout;
 import com.maizer.text.layout.TextAreaPaint;
 import com.maizer.text.layout.TextAreaLayout.Alignment;
@@ -40,7 +40,7 @@ public abstract class Measurer implements ArrayGc {
 
 	protected final Paint.FontMetricsInt fontMetricsInt = new FontMetricsInt();
 
-	private MeasureAttribute mAttribute;
+	private MeasureAttrubute mAttribute;
 
 	private int topPadding;
 	private int bottomPadding;
@@ -83,7 +83,7 @@ public abstract class Measurer implements ArrayGc {
 		SPECIAL_LETTERS[128] = '\uFFCD';
 	}
 
-	protected Measurer(MeasureAttribute attribute) {
+	protected Measurer(MeasureAttrubute attribute) {
 		mAttribute = attribute;
 		mTempPaint = new TextAreaPaint();
 	}
@@ -93,7 +93,7 @@ public abstract class Measurer implements ArrayGc {
 	 * 
 	 * @param attr
 	 */
-	public final void setMeasureAttrbute(MeasureAttribute attr) {
+	public final void setMeasureAttrbute(MeasureAttrubute attr) {
 		mAttribute = attr;
 	}
 
@@ -130,7 +130,7 @@ public abstract class Measurer implements ArrayGc {
 	}
 
 	/**
-	 * {@link MeasureAttribute#isFirstLineToTopWithSpacing}
+	 * {@link MeasureAttrubute#isFirstLineToTopWithSpacing}
 	 * 
 	 * @return
 	 */

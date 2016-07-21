@@ -2,7 +2,7 @@ package com.maizer.text.measure;
 
 import java.util.Arrays;
 
-import com.maizer.text.layout.LayoutAttribute;
+import com.maizer.text.layout.LayoutAttrubute;
 import com.maizer.text.layout.TextAreaLayout;
 import com.maizer.text.layout.TextAreaPaint;
 import com.maizer.text.liner.Lineable;
@@ -63,7 +63,7 @@ public class LineMeasurer extends Measurer {
 		mRecverWidth = null;
 	}
 
-	public LineMeasurer(MeasureAttribute attr, int size) {
+	public LineMeasurer(MeasureAttrubute attr, int size) {
 		super(attr);
 		mRecverWidth = new float[2];
 		mRecverChars = new char[2];

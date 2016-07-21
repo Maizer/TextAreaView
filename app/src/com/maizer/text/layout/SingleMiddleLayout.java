@@ -17,7 +17,7 @@ public class SingleMiddleLayout extends FormatLayout {
 
 	private static final String TAG = SingleMiddleLayout.class.getCanonicalName();
 
-	public SingleMiddleLayout(LayoutAttribute attrubute, CharSequence text, TextAreaPaint wp, boolean startSyncTask) {
+	public SingleMiddleLayout(LayoutAttrubute attrubute, CharSequence text, TextAreaPaint wp, boolean startSyncTask) {
 		super(attrubute, text, wp, startSyncTask);
 	}
 

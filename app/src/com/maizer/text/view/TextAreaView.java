@@ -14,11 +14,11 @@ import com.maizer.text.factory.CursorFactory;
 import com.maizer.text.layout.SingleMiddleLayout;
 import com.maizer.text.layout.DefaultCursorHelper;
 import com.maizer.text.layout.FormatLayout;
-import com.maizer.text.layout.LayoutAttribute;
+import com.maizer.text.layout.LayoutAttrubute;
 import com.maizer.text.layout.TextAreaLayout;
 import com.maizer.text.layout.TextAreaPaint;
 import com.maizer.text.layout.TextAreaScroller;
-import com.maizer.text.measure.MeasureAttribute;
+import com.maizer.text.measure.MeasureAttrubute;
 import com.maizer.text.layout.TextAreaLayout.Alignment;
 import com.maizer.text.util.TextInputConnector;
 
@@ -482,8 +482,8 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 	 * {@link TextAreaLayout#restartMeasure(int, TextAreaScroller, CursorDevicer)}
 	 * ·½·¨
 	 */
-	private LayoutAttribute mAttr;
-	private LayoutAttribute mHintAttr;
+	private LayoutAttrubute mAttr;
+	private LayoutAttrubute mHintAttr;
 
 	private EditorInfo mInfo = new EditorInfo();
 	private int mPrivateImeOptions;
@@ -948,7 +948,7 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 	private void initBaseInfo() {
 		setFocusable(true);
 		if (mAttr == null) {
-			mAttr = new LayoutAttribute();
+			mAttr = new LayoutAttrubute();
 		}
 		mFilters = new InputFilter[] { new ITextFilter() };
 		mPaint = new TextAreaPaint(Paint.ANTI_ALIAS_FLAG);
@@ -1357,7 +1357,7 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 		}
 		if ((mText == null || mText.length() <= 0) && mHint != null && mHint.length() > 0) {
 			if (mHintLayout == null) {
-				mHintAttr = new LayoutAttribute(mAttr);
+				mHintAttr = new LayoutAttrubute(mAttr);
 				mHintLayout = getDefaultLayoutAide(mAttr, mHint, getHintPaint());
 			} else if (mHintLayout.getText() != mHint) {
 				mHintLayout.setText(mHint);
@@ -2380,7 +2380,7 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 			mTop += mDrawables.getPaddingTop();
 		}
 		if (mAttr == null) {
-			mAttr = new LayoutAttribute();
+			mAttr = new LayoutAttrubute();
 		}
 		if (mAttr.paddingBottom != mBottom || mAttr.paddingTop != mTop) {
 			mAttr.paddingBottom = mBottom;
@@ -2428,7 +2428,7 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 		return mAttr.paddingRight;
 	}
 
-	protected TextAreaLayout getDefaultLayoutAide(LayoutAttribute l, CharSequence text, TextAreaPaint paint) {
+	protected TextAreaLayout getDefaultLayoutAide(LayoutAttrubute l, CharSequence text, TextAreaPaint paint) {
 		return new SingleMiddleLayout(l, text, paint, true);
 	}
 
