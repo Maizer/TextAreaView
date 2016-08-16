@@ -1,6 +1,7 @@
 package com.maizer.text.view;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.Locale;
 
 import org.xmlpull.v1.XmlPullParserException;
@@ -9,34 +10,31 @@ import com.maizer.BuildConfig;
 import com.maizer.R;
 import com.maizer.text.cursor.CursorDevicer;
 import com.maizer.text.cursor.CursorDevicer.CursorHelper;
-import com.maizer.text.cursor.DefaultCursor;
 import com.maizer.text.factory.CursorFactory;
-import com.maizer.text.layout.SingleMiddleLayout;
 import com.maizer.text.layout.DefaultCursorHelper;
 import com.maizer.text.layout.FormatLayout;
 import com.maizer.text.layout.LayoutAttrubute;
+import com.maizer.text.layout.SingleMiddleLayout;
 import com.maizer.text.layout.TextAreaLayout;
+import com.maizer.text.layout.TextAreaLayout.Alignment;
 import com.maizer.text.layout.TextAreaPaint;
 import com.maizer.text.layout.TextAreaScroller;
-import com.maizer.text.measure.MeasureAttrubute;
-import com.maizer.text.layout.TextAreaLayout.Alignment;
+import com.maizer.text.test.Tool;
 import com.maizer.text.util.TextInputConnector;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.content.res.XmlResourceParser;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Paint.Style;
 import android.graphics.Rect;
 import android.graphics.Typeface;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.Drawable.Callback;
-import android.icu.math.BigDecimal;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -44,7 +42,6 @@ import android.text.Selection;
 import android.text.SpanWatcher;
 import android.text.Spannable;
 import android.text.Spanned;
-import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.TextUtils.TruncateAt;
 import android.text.TextWatcher;
@@ -54,7 +51,6 @@ import android.text.method.DialerKeyListener;
 import android.text.method.DigitsKeyListener;
 import android.text.method.KeyListener;
 import android.text.method.TextKeyListener;
-import android.text.method.TextKeyListener.Capitalize;
 import android.text.method.TimeKeyListener;
 import android.text.method.TransformationMethod;
 import android.util.AttributeSet;
@@ -71,7 +67,6 @@ import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 /**
  * 对大文本进行支持的TextAreaView,可能并不支持原始TextView的部分特性
@@ -110,6 +105,7 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 
 	protected void onFocusChanged(boolean gainFocus, int direction, Rect previouslyFocusedRect) {
 		super.onFocusChanged(gainFocus, direction, previouslyFocusedRect);
+		Log.e(TAG, "Fouchs>" + gainFocus);
 		if (mCursorDevicer != null) {
 			if (gainFocus && onCheckIsTextEditor()) {
 				mCursorDevicer.setVisibility(true);
@@ -122,26 +118,35 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 			}
 		} else {
 			if (gainFocus) {
-				if (SHARE_CURSOR != null && SHARE_CURSOR.checkView(this)) {
-					SHARE_CURSOR.setDefaultMoveLevel(mReviseX, mReviseY);
-					if (!inTouching()) {
-						CursorHelper ch = getCursorHelper();
-						ch.requestMoveCursor(SHARE_CURSOR, this);
-					}
-					mCursorDevicer = SHARE_CURSOR;
+				if (SHARE_CURSOR != null) {
+					checkCursor(SHARE_CURSOR, !inTouching(), false);
 				}
+			} else if (SHARE_CURSOR != null && SHARE_CURSOR == mCursorDevicer) {
+				mCursorDevicer.setVisibility(false);
+				mCursorDevicer = null;
 			}
+			// if (gainFocus) {
+			// if (SHARE_CURSOR != null && SHARE_CURSOR.checkView(this)) {
+			// SHARE_CURSOR.setDefaultMoveLevel(mReviseX, mReviseY);
+			// if (!inTouching()) {
+			// CursorHelper ch = getCursorHelper();
+			// ch.requestMoveCursor(SHARE_CURSOR, this);
+			// }
+			// mCursorDevicer = SHARE_CURSOR;
+			// }
+			// }
 		}
 	}
 
-	public boolean requestFocus(int direction, Rect previouslyFocusedRect) {
-		return super.requestFocus(direction, previouslyFocusedRect);
-	}
-
-	public void clearFocus() {
-		super.clearFocus();
-		if (SHARE_CURSOR == mCursorDevicer) {
-			mCursorDevicer = null;
+	private void checkCursor(CursorDevicer cd, boolean move, boolean checkTrue) {
+		if (cd != null && (cd.checkView(this) || !checkTrue)) {
+			cd.setDefaultMoveLevel(mReviseX, mReviseY);
+			if (move) {
+				CursorHelper ch = getCursorHelper();
+				ch.requestMoveCursor(SHARE_CURSOR, this);
+			}
+			mCursorDevicer = cd;
+			mCursorDevicer.setVisibility(true);
 		}
 	}
 
@@ -379,6 +384,7 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 	}
 
 	public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
+
 		if (onCheckIsTextEditor() && isEnabled()) {
 			if (mInfo != null) {
 				outAttrs.imeOptions = mInfo.imeOptions;
@@ -422,9 +428,11 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 				outAttrs.initialSelStart = getSelectionStart();
 				outAttrs.initialSelEnd = getSelectionEnd();
 				outAttrs.initialCapsMode = ic.getCursorCapsMode(mInfo.inputType);
+				Log.e(TAG, "" + ic);
 				return ic;
 			}
 		}
+		Log.e(TAG, "null");
 		return null;
 	}
 
@@ -448,6 +456,7 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 
 	@Override
 	public boolean checkInputConnectionProxy(View view) {
+		Log.e(TAG, "" + view + "   " + this + "  " + isEditable + "   " + isEnabled());
 		return isEditable && isEnabled() && view == this;
 	}
 
@@ -519,15 +528,18 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 	private float mDownX;
 	private float mDownY;
 
+	private ColorStateList mTextColor;
+	private ColorStateList mHintTextColor;
+
+	private int mCurTextColor = Color.BLACK;
+	private int mCurHintTextColor = Color.GRAY;
+
 	public TextAreaView(Context context, AttributeSet attrs, int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
 	}
 
-	Toast toast;
-
 	public TextAreaView(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		toast = Toast.makeText(context, "", Toast.LENGTH_SHORT);
 		initBaseInfo();
 
 		CharSequence text = null;
@@ -1345,7 +1357,6 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 			if (mLayout != null) {
 				mLayout.setText(mText);
 				restartLayout();
-				// requestLayout();
 			}
 		}
 		refreshHintLayout(getWidth(), getHeight());
@@ -1368,6 +1379,96 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 		} else if (mCursorDevicer != null && !mCursorDevicer.isVisibility() && onCheckIsTextEditor()) {
 			mCursorDevicer.setVisibility(true);
 		}
+	}
+
+	protected void drawableStateChanged() {
+		super.drawableStateChanged();
+		if (mTextColor != null && mTextColor.isStateful() || (mHintTextColor != null && mHintTextColor.isStateful())) {
+			updateTextColors();
+		}
+
+		final Drawables dr = mDrawables;
+		if (dr != null) {
+			int[] state = getDrawableState();
+			dr.drawableStateChanged(state);
+		}
+	}
+
+	private void updateTextColors() {
+		boolean inval = false;
+		int color = mTextColor.getColorForState(getDrawableState(), 0);
+		if (color != mCurTextColor) {
+			mCurTextColor = color;
+			inval = true;
+		}
+		if (mHintTextColor != null) {
+			color = mHintTextColor.getColorForState(getDrawableState(), 0);
+			if (color != mCurHintTextColor && mText.length() == 0) {
+				mCurHintTextColor = color;
+				inval = true;
+			}
+		}
+		if (inval) {
+			invalidate();
+		}
+	}
+
+	/**
+	 * Sets the text color for all the states (normal, selected, focused) to be
+	 * this color.
+	 *
+	 */
+	public void setTextColor(int color) {
+		if (color > 1) {
+			color = getResources().getColor(color, getContext().getTheme());
+		}
+		mTextColor = ColorStateList.valueOf(color);
+		updateTextColors();
+	}
+
+	public void setTextColorId(int id) {
+		int color = getResources().getColor(id, getContext().getTheme());
+		mTextColor = ColorStateList.valueOf(color);
+		updateTextColors();
+	}
+
+	public void setHintTextColorId(int id) {
+		int color = getResources().getColor(id, getContext().getTheme());
+		mHintTextColor = ColorStateList.valueOf(color);
+		updateTextColors();
+	}
+
+	public void setHintTextColor(ColorStateList color) {
+		if (color == null) {
+			throw new NullPointerException();
+		}
+		mHintTextColor = color;
+		updateTextColors();
+	}
+
+	/**
+	 * Sets the text color.
+	 */
+	public void setTextColor(ColorStateList colors) {
+		if (colors == null) {
+			throw new NullPointerException();
+		}
+
+		mTextColor = colors;
+		updateTextColors();
+	}
+
+	/**
+	 * Return the set of text colors.
+	 *
+	 * @return Returns the set of text colors.
+	 */
+	public final ColorStateList getTextColors() {
+		return mTextColor;
+	}
+
+	public final ColorStateList getHintColors() {
+		return mHintTextColor;
 	}
 
 	/**
@@ -1404,10 +1505,12 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 		canvas.translate(-scrollX, -scrollY);
 		boolean showHint = canShowHint();
 		int paddingTop = mLayout.getPaddingTop();
+		
 		int paddingLeft = mLayout.getPaddingLeft();
 		int paddingBottom = mLayout.getPaddingBottom();
 		int paddingRight = mLayout.getPaddingRight();
-		int layoutheight = mLayout.getHeight(), mHeight = getHeight();
+		int layoutheight = mLayout.getHeight();
+		int mHeight = getHeight();
 		if (showHint) {
 			int hintLayoutHeight = mHintLayout.getHeight();
 			if (layoutheight < hintLayoutHeight) {
@@ -1426,8 +1529,10 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 			}
 			canvas.translate(paddingLeft, paddingTop + mReviseY);
 			if (showHint) {
+				mHintPaint.setColor(mCurHintTextColor);
 				mHintLayout.draw(canvas);
 			} else if (mLayout != null) {
+				mPaint.setColor(mCurTextColor);
 				mLayout.draw(canvas);
 			}
 			canvas.restoreToCount(save);
@@ -1436,8 +1541,10 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 				mCursorDevicer.draw(canvas);
 			}
 			if (showHint) {
+				mHintPaint.setColor(mCurHintTextColor);
 				mHintLayout.draw(canvas);
 			} else if (mLayout != null) {
+				mPaint.setColor(mCurTextColor);
 				mLayout.draw(canvas);
 			}
 		}
@@ -1491,15 +1598,21 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 		return mPaint;
 	}
 
+	public boolean post(Runnable action) {
+		return super.post(action);
+	}
+
 	protected void requestMoveCursor(int x, int y) {
 		CursorHelper helper = getCursorHelper();
+		CursorDevicer cursor = mCursorDevicer;
 		if (helper != null) {
-			helper.requestMoveCursor(x, y - mReviseY, mCursorDevicer, this);
+			checkCursor(cursor, false, true);
+			helper.requestMoveCursor(x, y - mReviseY, cursor, this);
 			if (isEditable) {
+				requestFocus();
 				if (imm == null) {
 					imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
 				}
-				requestFocus();
 				imm.viewClicked(this);
 				imm.showSoftInput(this, 0);
 			}
@@ -1548,7 +1661,7 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 			if (mCursorDevicer != null) {
 				int firstTop = mLayout.getLineTop(0);
 				int cX = mCursorDevicer.getCurrX();
-				int cY = mCursorDevicer.getCurrY() - y+firstTop;
+				int cY = mCursorDevicer.getCurrY() - y + firstTop;
 				mCursorDevicer.requestUpdate(cX, cY, false);
 			}
 			oldScrollY -= y;
@@ -1609,6 +1722,7 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 			int left = getCompoundPaddingLeft();
 			int right = getCompoundPaddingRight();
 			if (x < left || x > left + mLayout.getWidth()) {
+				Log.e(TAG, "LEft>" + left + "   Right>" + right);
 				return MoveFlag.BLOCK;
 			}
 			int top = getCompoundPaddingTop();
@@ -1653,7 +1767,9 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 		if (mMoveFlag == MoveFlag.BLOCK) {
 			return false;
 		}
-		mTracker.addMovement(event);
+		if (mTracker != null) {
+			mTracker.addMovement(event);
+		}
 		float rawX = event.getRawX();
 		float rawY = event.getRawY();
 		if (mMoveFlag == MoveFlag.NO) {
@@ -1698,6 +1814,9 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 					return false;
 				}
 			} else if (mLayout.hasFullLayoutHeight() <= 0) {
+				return false;
+			}
+			if (mTracker == null) {
 				return false;
 			}
 			if (MoveFlag.isVertical(mMoveFlag)) {
@@ -1811,7 +1930,7 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 		}
 	}
 
-	public boolean dispatchTouchEvent(MotionEvent event) {
+	public boolean onTouchEvent(MotionEvent event) {
 		switch (event.getAction()) {
 		case MotionEvent.ACTION_DOWN:
 			if (touchDown(event)) {
@@ -1830,7 +1949,7 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 			}
 			break;
 		}
-		return super.dispatchTouchEvent(event);
+		return super.onTouchEvent(event);
 	}
 
 	protected FlingRunnable getFlingRunnable() {
@@ -2386,12 +2505,12 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 			mAttr.paddingBottom = mBottom;
 			mAttr.paddingTop = mTop;
 		}
+		Log.e(TAG, ">>>>>>  "+mLeft+"   "+mRight);
 		if (mAttr.paddingLeft != mLeft || mAttr.paddingRight != mRight) {
 			mAttr.paddingLeft = mLeft;
 			mAttr.paddingRight = mRight;
 			if (layout) {
 				requestLayout();
-				invalidate();
 			}
 		}
 	}
@@ -2438,7 +2557,7 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 			if (mLayout != null && mLayout.getLineRecyleCount() > 0) {
 				mLayout.restartMeasure(mLayout.getLineStart(0), this);
 				CursorDevicer cd = mCursorDevicer;
-				CursorHelper ch = mCursorHelper;
+				CursorHelper ch = getCursorHelper();
 				if (cd != null && ch != null) {
 					ch.requestMoveCursor(cd, this);
 				}
@@ -2452,7 +2571,7 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 			mAttr.spacingMult = mult;
 			if (mLayout != null && mLayout.getLineRecyleCount() > 0) {
 				CursorDevicer cd = mCursorDevicer;
-				CursorHelper ch = mCursorHelper;
+				CursorHelper ch = getCursorHelper();
 				mLayout.restartMeasure(mLayout.getLineStart(0), this);
 				if (cd != null && ch != null) {
 					ch.requestMoveCursor(cd, this);
@@ -2569,10 +2688,6 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 		return false;
 	}
 
-	public boolean onTouchEvent(MotionEvent event) {
-		return super.onTouchEvent(event);
-	}
-
 	protected class FlingRunnable implements Runnable {
 
 		private float mStart;
@@ -2661,9 +2776,20 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 
 	}
 
+	protected void onAttachedToWindow() {
+		super.onAttachedToWindow();
+		Log.e(TAG, "onAtt");
+		assumeLayout();
+		updateLayoutPadding(true);
+		if (mCursorDevicer == null) {
+			mCursorDevicer = getDefaultCursor();
+		}
+	}
+
 	@Override
 	protected void onDetachedFromWindow() {
 		super.onDetachedFromWindow();
+		Log.e(TAG, "Detached");
 		if (mLayout != null) {
 			mLayout.clear();
 			mLayout = null;
@@ -2672,17 +2798,14 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 			mCursorDevicer.setVisibility(false);
 			mCursorDevicer = null;
 		}
-		if (mDrawables != null) {
-			mDrawables.mBottom = mDrawables.mLeft = mDrawables.mTop = mDrawables.mRight = null;
-			mDrawables = null;
+		if (mHintLayout != null) {
+			mHintLayout.clear();
+			mHintLayout = null;
 		}
-		if (mAttr != null) {
-			mAttr.lineFormat = null;
-			mAttr = null;
+		if(mCursorHelper != null){
+			mCursorHelper = null;
 		}
-		mInfo = null;
 		imm = null;
-		mPaint = null;
 	}
 
 	private class ITextFilter implements InputFilter {
@@ -2789,10 +2912,13 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 				if (BuildConfig.DEBUG) {
 					Log.e(TAG, "Textchange");
 				}
-				boolean handInvalidate = !mLayout.restartMeasure(isSingleLine() ? Selection.getSelectionEnd(s) : start,
+				TextAreaLayout mlayout = mLayout;
+				CursorDevicer mcursor = mCursorDevicer;
+				checkCursor(mcursor, false, true);
+				boolean handInvalidate = !mlayout.restartMeasure(isSingleLine() ? Selection.getSelectionEnd(s) : start,
 						TextAreaView.this);
-				if (mLayout.getHeight() + getPaddingVertical() != getHeight()
-						|| mLayout.getWidth() + getPaddingHorizontal() != getWidth()) {
+				if (mlayout.getHeight() + getPaddingVertical() != getHeight()
+						|| mlayout.getWidth() + getPaddingHorizontal() != getWidth()) {
 					requestLayout();
 				}
 				handInvalidate |= !reviseGrivaty();
@@ -2804,12 +2930,15 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 					refreshHintLayout(getWidth(), getHeight());
 					return;
 				}
-				handInvalidate |= !mCursorMove.requestMoveCursor(mCursorDevicer, TextAreaView.this);
-				handInvalidate |= !updateCursorToVisibileScreen();
+				handInvalidate |= !mCursorMove.requestMoveCursor(mcursor, TextAreaView.this)
+						| !updateCursorToVisibileScreen();
 				if (handInvalidate) {
 					invalidate();
 				}
 				refreshHintLayout(getWidth(), getHeight());
+				if (BuildConfig.DEBUG) {
+					Log.e(TAG, "Textchangedddd");
+				}
 			}
 		}
 
@@ -2838,6 +2967,21 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 
 		boolean scaleLevel;
 
+		void drawableStateChanged(int[] state) {
+			if (mLeft != null && mLeft.isStateful()) {
+				mLeft.setState(state);
+			}
+			if (mRight != null && mRight.isStateful()) {
+				mRight.setState(state);
+			}
+			if (mTop != null && mTop.isStateful()) {
+				mTop.setState(state);
+			}
+			if (mBottom != null && mBottom.isStateful()) {
+				mBottom.setState(state);
+			}
+		}
+
 		public void setDrawablePadding(int left, int top, int right, int bottom) {
 			mCompoundPaddingTop = top;
 			mCompoundPaddingBottom = bottom;
@@ -2861,6 +3005,7 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 
 		private int getPaddingLeft() {
 			if (mLeft != null) {
+				Log.e(TAG, "Left>"+mLeft.getBounds().width()+"   "+mCompoundPaddingLeft);
 				return mCompoundPaddingLeft + mLeft.getBounds().width();
 			}
 			return 0;

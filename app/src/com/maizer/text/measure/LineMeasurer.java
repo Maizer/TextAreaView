@@ -28,7 +28,6 @@ import android.widget.TextView;
  * @author Maizer/ÂóÔó
  *
  */
-@SuppressLint("NewApi")
 public class LineMeasurer extends Measurer {
 
 	private static final String TAG = LineMeasurer.class.getCanonicalName();

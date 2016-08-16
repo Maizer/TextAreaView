@@ -429,19 +429,6 @@ public class ObjectLinked<T> implements ArrayGc {
 		sb.append("\n");
 		sb.append("Last > " + last);
 		sb.append("\n");
-		if (die != null) {
-			int i = 0;
-			Node<T> n = die;
-			while (n != null) {
-				sb.append("Die > " + n);
-				sb.append("\n");
-				n = die.next;
-				i++;
-			}
-			sb.append("Die size > " + i + "   " + die.last);
-		} else {
-			sb.append("Die > " + die);
-		}
 		return sb.toString();
 	}
 

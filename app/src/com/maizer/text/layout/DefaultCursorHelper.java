@@ -293,14 +293,16 @@ public class DefaultCursorHelper implements CursorHelper {
 		if (isSelecting()) {
 			return false;
 		}
-		if (BuildConfig.DEBUG) {
-			Log.e(TAG, "CursorChanged");
-		}
+		selecting();
+//		if (BuildConfig.DEBUG) {
+//			Log.e(TAG, "CursorChanged");
+//		}
 		FormatLayout mLayout = layout;
 		CharSequence text = mLayout.getText();
 		ObjectLinked<Lineable> mLinears = mLayout.getLineArray();
 		if (text == null || text.length() <= 0 || mLinears.size() == 0) {
 			regainCursor(cursor, true, true);
+			selected();
 			return true;
 		}
 		if (text instanceof Spannable) {
@@ -342,7 +344,6 @@ public class DefaultCursorHelper implements CursorHelper {
 			} else {
 				selectEnd = mLayout.checkTruncateAt(text, selectEnd);
 			}
-			selecting();
 			boolean handUpdata = refreshAll;
 			boolean isSingleLine = mLayout.isSingleLine();
 			if (isSingleLine) {
@@ -390,6 +391,7 @@ public class DefaultCursorHelper implements CursorHelper {
 			selected();
 			return handUpdata;
 		}
+		selected();
 		return false;
 	}
 

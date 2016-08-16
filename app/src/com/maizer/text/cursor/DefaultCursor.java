@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.sax.StartElementListener;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -221,7 +222,7 @@ public class DefaultCursor implements CursorDevicer {
 			if (mCursor == null) {
 				mCursor = getDrfaultCursorDrawable();
 			}
-			mView.post(this);
+			boolean b = mView.post(this);
 		}
 
 		void remove() {
@@ -288,16 +289,19 @@ public class DefaultCursor implements CursorDevicer {
 
 	@Override
 	public boolean checkView(View view) {
-		if (mView != null) {
-			mView.clearFocus();
+		if (mView != view) {
+			if (mView != null) {
+				mView.clearFocus();
+			}
+			if (mFlicker != null) {
+				mFlicker.remove();
+			}
+			mFlicker = null;
+			mVisible = true;
+			mView = view;
+			return true;
 		}
-		if (mFlicker != null) {
-			mFlicker.remove();
-		}
-		mFlicker = null;
-		mVisible = true;
-		mView = view;
-		return true;
+		return false;
 	}
 
 	@Override

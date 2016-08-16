@@ -211,6 +211,10 @@ public abstract class TextAreaLayout implements ArrayGc {
 	public final LineFactory getLineFactory() {
 		return mAttribute.lineFactory;
 	}
+	
+	public final int getInitArraySize(){
+		return mAttribute.initArraySize;
+	}
 
 	public int getDefaultHeight() {
 		LineFactory mFactory = getLineFactory();
@@ -454,7 +458,7 @@ public abstract class TextAreaLayout implements ArrayGc {
 	public final int getHeight() {
 		return mAttribute.height;
 	}
-
+	
 	/**
 	 * 最大原始高度,>={@link LayoutBuilder#height}
 	 * 

@@ -7,23 +7,22 @@ import com.maizer.text.measure.Measurer.LineFormat;
 import android.text.TextUtils;
 
 public abstract class MeasureAttrubute {
-	public static final String ELLIPSIS_NORMAL = "\u2026"; // this is "..."
-	public static final String ELLIPSIS_TWO_DOTS = "\u2025"; // this is ".."
-	public static final String ELLIPSIS_CENTER = "\u00b7\u00b7\u00b7";// this is
-																		// "···"\
-	public static final String ELLIPSIS_TWO_DOTS_CENTER = "\u00b7\u00b7"; // this
-																			// is
-																			// "··"
-	public static final String ELLIPSIS_DENSE = "\u2022\u2022\u2022";// this is
-																		// "•••"
-	public static final String ELLIPSIS_TWO_DOTS_DENSE = "\u2022\u2022";// this
-																		// is
-																		// "••"
-	public static final String ELLIPSIS_WAVE = "\u007e\u007e\u007e";// this is
-																	// "~~~"
-	public static final String ELLIPSIS_TWO_DOTS_WAVE = "\u007e\u007e";// this
-																		// is
-																		// "~~"
+	/** this is "..." */
+	public static final String ELLIPSIS_NORMAL = "\u2026";
+	/** this is ".." */
+	public static final String ELLIPSIS_TWO_DOTS = "\u2025";
+	/** this is "···" */
+	public static final String ELLIPSIS_CENTER = "\u00b7\u00b7\u00b7";
+	/** this is "··" */
+	public static final String ELLIPSIS_TWO_DOTS_CENTER = "\u00b7\u00b7";
+	/** this is "•••" */
+	public static final String ELLIPSIS_DENSE = "\u2022\u2022\u2022";
+	/** this is "••" */
+	public static final String ELLIPSIS_TWO_DOTS_DENSE = "\u2022\u2022";
+	/** this is "~~~" */
+	public static final String ELLIPSIS_WAVE = "\u007e\u007e\u007e";
+	/** this is "~~" */
+	public static final String ELLIPSIS_TWO_DOTS_WAVE = "\u007e\u007e";
 	/**
 	 * @hide
 	 */
@@ -90,6 +89,6 @@ public abstract class MeasureAttrubute {
 		maxLinesLimitHeight = m.maxLinesLimitHeight;
 		initArraySize = m.initArraySize;
 	}
-	
+
 	public abstract Measurer build();
 }

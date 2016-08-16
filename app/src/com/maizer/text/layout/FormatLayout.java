@@ -722,9 +722,8 @@ public class FormatLayout extends TextAreaLayout {
 			}
 			checkFirstPageMaxDisplay();
 			startSyncTask();
-			// +++1 122 470202 471222
-			Log.e(TAG, "+++" + mLinears.size() + "  " + getHeight() + "  " + aide.getTextScrollY() + "   "
-					+ mLinears.getFirst().getTop());
+//			Log.e(TAG, "" + mLinears.size() + "  " + getHeight() + "  " + aide.getTextScrollY() + "   "
+//					+ mLinears.getFirst().getTop());
 			return handerUpdata;
 		}
 		if (isSingleLine()) {
@@ -1547,6 +1546,7 @@ class PointArray implements ArrayGc {
 	public void die() {
 		Arrays.fill(mPoints, 0);
 		mPoints = null;
+		layout = null;
 	}
 
 	public void gc() {
