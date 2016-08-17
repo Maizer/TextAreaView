@@ -31,6 +31,7 @@ import android.view.inputmethod.ExtractedText;
 import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputConnection;
 import android.widget.HeterogeneousExpandableList;
+import android.widget.Toast;
 import android.widget.TwoLineListItem;
 
 /**
@@ -43,6 +44,9 @@ public class TextInputConnector extends BaseInputConnection {
 	@Override
 	public void closeConnection() {
 		super.closeConnection();
+		ourView = null;
+		mEditText = null;
+		mBatchString = null;
 	}
 
 	@Override
@@ -53,15 +57,11 @@ public class TextInputConnector extends BaseInputConnection {
 
 	@Override
 	public CharSequence getTextBeforeCursor(int n, int flags) {
-		Log.e(TAG, "getTextBeforeCursor>" + n + "  ");
-		// return super.getTextBeforeCursor(n, flags);
 		return null;
 	}
 
 	@Override
 	public CharSequence getTextAfterCursor(int n, int flags) {
-		Log.e(TAG, "getTextAfterCursor>" + n);
-		// return super.getTextAfterCursor(n, flags);
 		return null;
 	}
 
@@ -74,13 +74,11 @@ public class TextInputConnector extends BaseInputConnection {
 
 	@Override
 	public CharSequence getSelectedText(int flags) {
-		Log.e(TAG, "getSelectedText");
 		return null;
 	}
 
 	@Override
 	public boolean clearMetaKeyStates(int states) {
-		Log.e(TAG, "clearMetaKeyStates");
 		return super.clearMetaKeyStates(states);
 	}
 
@@ -121,8 +119,6 @@ public class TextInputConnector extends BaseInputConnection {
 	 */
 	private boolean noTrick;
 
-	private ClipboardManager cm;
-
 	/**
 	 * 抽象的输入法连接类,
 	 * 
@@ -131,6 +127,9 @@ public class TextInputConnector extends BaseInputConnection {
 
 	public TextInputConnector(Editable editor, View view) {
 		super(view, true);
+		if (view == null || editor == null) {
+			throw new NullPointerException();
+		}
 		mEditText = editor;
 		ourView = view;
 	}
@@ -150,7 +149,6 @@ public class TextInputConnector extends BaseInputConnection {
 
 	@Override
 	public boolean deleteSurroundingText(int beforeLength, int afterLength) {
-		Log.e(TAG, "deleteSurroundingText");
 		if (beforeLength > afterLength) {
 			int len = beforeLength - afterLength;
 			if (mBatchString != null && mBatchString.length() > len) {
@@ -439,8 +437,10 @@ public class TextInputConnector extends BaseInputConnection {
 	}
 
 	private void copy() {
+		ClipboardManager cm = (ClipboardManager) ourView.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
 		if (cm == null) {
-			cm = (ClipboardManager) ourView.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+			Log.e(TAG, "System Error : clipboardManager die!");
+			return;
 		}
 		CharSequence text = getText();
 		int start = Selection.getSelectionStart(text);
@@ -464,10 +464,8 @@ public class TextInputConnector extends BaseInputConnection {
 
 	@Override
 	public boolean performContextMenuAction(int id) {
-		Log.e(TAG, "performAction>" + id);
 		switch (id) {
 		case R.id.selectAll:
-			Log.e(TAG, "全选");
 			setSelectToEditor(0, length());
 			break;
 		case R.id.cut:
@@ -475,21 +473,21 @@ public class TextInputConnector extends BaseInputConnection {
 			deleteSelect(getSelectStart(), getSelectEnd());
 			break;
 		case R.id.startSelectingText:
-			Log.e(TAG, "startSelect");
 			setShift(true);
 			break;
 		case R.id.stopSelectingText:
-			Log.e(TAG, "StopSelect");
 			setShift(false);
 			break;
 		case R.id.copy:
 			copy();
 			break;
 		case R.id.paste:
-			commitText(getSelectStart(), getSelectEnd(), "");
+			ClipboardManager cm = (ClipboardManager) ourView.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
 			if (cm == null) {
-				cm = (ClipboardManager) ourView.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+				Log.e(TAG, "System Error : clipboardManager die!");
+				return true;
 			}
+			commitText(getSelectStart(), getSelectEnd(), "");
 			ClipData data = cm.getPrimaryClip();
 			if (data == null) {
 				return true;

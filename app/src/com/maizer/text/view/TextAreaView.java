@@ -89,7 +89,7 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 	}
 
 	private void registerForPreDraw() {
-		if (isEditable && imm != null) {
+		if (isEditable) {
 			getViewTreeObserver().addOnPreDrawListener(this);
 		}
 	}
@@ -105,10 +105,10 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 
 	protected void onFocusChanged(boolean gainFocus, int direction, Rect previouslyFocusedRect) {
 		super.onFocusChanged(gainFocus, direction, previouslyFocusedRect);
-		Log.e(TAG, "Fouchs>" + gainFocus);
 		if (mCursorDevicer != null) {
 			if (gainFocus && onCheckIsTextEditor()) {
 				mCursorDevicer.setVisibility(true);
+				showInput();
 			} else {
 				if (SHARE_CURSOR == mCursorDevicer) {
 					mCursorDevicer = null;
@@ -120,6 +120,7 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 			if (gainFocus) {
 				if (SHARE_CURSOR != null) {
 					checkCursor(SHARE_CURSOR, !inTouching(), false);
+					showInput();
 				}
 			} else if (SHARE_CURSOR != null && SHARE_CURSOR == mCursorDevicer) {
 				mCursorDevicer.setVisibility(false);
@@ -194,60 +195,44 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 						break;
 					case EditorInfo.IME_ACTION_DONE:
 						if (mActionListener != null) {
-							if (imm != null) {
-								imm.hideSoftInputFromWindow(getWindowToken(), 0);
-							}
+							hideInput();
 							mActionListener.onDoneAction(this);
 						}
 						if (isSingleLine()) {
-							if (imm != null) {
-								imm.hideSoftInputFromWindow(getWindowToken(), 0);
-							}
+							hideInput();
 							return true;
 						}
 						return false;
 					case EditorInfo.IME_ACTION_GO:
 						if (mActionListener != null) {
-							if (imm != null) {
-								imm.hideSoftInputFromWindow(getWindowToken(), 0);
-							}
+							hideInput();
 							mActionListener.onGoAction(this);
 							return true;
 						}
 						if (isSingleLine()) {
-							if (imm != null) {
-								imm.hideSoftInputFromWindow(getWindowToken(), 0);
-							}
+							hideInput();
 							return true;
 						}
 						return false;
 					case EditorInfo.IME_ACTION_SEARCH:
 						if (mActionListener != null) {
-							if (imm != null) {
-								imm.hideSoftInputFromWindow(getWindowToken(), 0);
-							}
+							hideInput();
 							mActionListener.onSearchAction(this);
 							return true;
 						}
 						if (isSingleLine()) {
-							if (imm != null) {
-								imm.hideSoftInputFromWindow(getWindowToken(), 0);
-							}
+							hideInput();
 							return true;
 						}
 						return false;
 					case EditorInfo.IME_ACTION_SEND:
 						if (mActionListener != null) {
-							if (imm != null) {
-								imm.hideSoftInputFromWindow(getWindowToken(), 0);
-							}
+							hideInput();
 							mActionListener.onSendAction(this);
 							return true;
 						}
 						if (isSingleLine()) {
-							if (imm != null) {
-								imm.hideSoftInputFromWindow(getWindowToken(), 0);
-							}
+							hideInput();
 							return true;
 						}
 						return false;
@@ -428,11 +413,9 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 				outAttrs.initialSelStart = getSelectionStart();
 				outAttrs.initialSelEnd = getSelectionEnd();
 				outAttrs.initialCapsMode = ic.getCursorCapsMode(mInfo.inputType);
-				Log.e(TAG, "" + ic);
 				return ic;
 			}
 		}
-		Log.e(TAG, "null");
 		return null;
 	}
 
@@ -456,7 +439,6 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 
 	@Override
 	public boolean checkInputConnectionProxy(View view) {
-		Log.e(TAG, "" + view + "   " + this + "  " + isEditable + "   " + isEnabled());
 		return isEditable && isEnabled() && view == this;
 	}
 
@@ -472,7 +454,6 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 	private Editable.Factory mEditableFactory = Editable.Factory.getInstance();
 	private CursorFactory mCursorFactory = CursorFactory.getInstance();
 
-	private InputMethodManager imm;
 	private Drawables mDrawables;
 
 	private TextAreaPaint mPaint;
@@ -962,7 +943,7 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 		if (mAttr == null) {
 			mAttr = new LayoutAttrubute();
 		}
-		mFilters = new InputFilter[] { new ITextFilter() };
+		mFilters = new InputFilter[] { new TextFilterProxy() };
 		mPaint = new TextAreaPaint(Paint.ANTI_ALIAS_FLAG);
 		mInfo.packageName = getContext().getPackageName();
 		mInfo.fieldId = getId();
@@ -984,10 +965,26 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 	public void setPrivateImeOptions(String type) {
 		if (type != mInfo.privateImeOptions) {
 			mInfo.privateImeOptions = type;
-			if (isEditable && isEnabled() && imm != null) {
-				imm.restartInput(this);
+			if (isEditable && isEnabled()) {
+				restartInput();
 			}
 		}
+	}
+
+	private void restartInput() {
+		InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.restartInput(this);
+	}
+
+	private boolean showInput() {
+		InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.viewClicked(this);
+		return imm.showSoftInput(this, 0);
+	}
+
+	private void hideInput() {
+		InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.hideSoftInputFromWindow(getWindowToken(), 0);
 	}
 
 	/**
@@ -1078,8 +1075,8 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 			if (mText != null) {
 				setText(mText);
 			}
-			if (isEditable && isEnabled() && imm != null) {
-				imm.restartInput(this);
+			if (isEditable && isEnabled()) {
+				restartInput();
 			}
 		}
 	}
@@ -1099,8 +1096,8 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 		if (mInfo.actionId != actionId || mInfo.label != label) {
 			mInfo.actionId = actionId;
 			mInfo.label = label;
-			if (isEditable && isEnabled() && imm != null) {
-				imm.restartInput(this);
+			if (isEditable && isEnabled()) {
+				restartInput();
 			}
 		}
 	}
@@ -1146,26 +1143,23 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 			if (editable) {
 				if (mCursorDevicer == null) {
 					mCursorDevicer = getDefaultCursor();
-				} else {
-					mCursorDevicer.setVisibility(true);
 				}
-				if (mText instanceof Editable) {
-					return;
-				}
-				if (mText != null) {
+				if (mText != null && !(mText instanceof Editable)) {
 					mText = getDefaultEditable(mText);
 					if (mLayout != null) {
 						mLayout.setText(mText);
 						restartLayout();
 					}
 				}
+				if (hasFocus()) {
+					mCursorDevicer.setVisibility(true);
+					restartInput();
+				}
 			} else {
 				if (mCursorDevicer != null) {
 					mCursorDevicer.setVisibility(false);
 				}
-				if (imm != null) {
-					imm.hideSoftInputFromWindow(getWindowToken(), 0);
-				}
+				hideInput();
 			}
 		}
 	}
@@ -1235,8 +1229,8 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 	public void setImeOptions(int imeOptions) {
 		if (mInfo.imeOptions != imeOptions) {
 			mInfo.imeOptions = imeOptions;
-			if (isEditable && isEnabled() && imm != null) {
-				imm.restartInput(this);
+			if (isEditable && isEnabled()) {
+				restartInput();
 			}
 		}
 	}
@@ -1334,25 +1328,22 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 	}
 
 	public void setText(CharSequence text) {
+		if (text != null) {
+			text = mFilters[0].filter(text, 0, text.length(), null, 0, 0);
+		}
 		if (isEditable) {
 			if (mText instanceof Editable) {
 				((Editable) mText).clear();
 				((Editable) mText).clearSpans();
 				mText = null;
 			}
-			if (text != null) {
-				text = mFilters[0].filter(text, 0, text.length(), null, 0, 0);
-			}
 			mText = getDefaultEditable(text);
 			if (mLayout != null) {
 				mLayout.setText(mText);
 				restartLayout();
-				// requestLayout();
+				restartInput();
 			}
 		} else if (mText != text) {
-			if (text != null) {
-				text = mFilters[0].filter(text, 0, text.length(), null, 0, 0);
-			}
 			mText = text;
 			if (mLayout != null) {
 				mLayout.setText(mText);
@@ -1505,7 +1496,7 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 		canvas.translate(-scrollX, -scrollY);
 		boolean showHint = canShowHint();
 		int paddingTop = mLayout.getPaddingTop();
-		
+
 		int paddingLeft = mLayout.getPaddingLeft();
 		int paddingBottom = mLayout.getPaddingBottom();
 		int paddingRight = mLayout.getPaddingRight();
@@ -1610,11 +1601,7 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 			helper.requestMoveCursor(x, y - mReviseY, cursor, this);
 			if (isEditable) {
 				requestFocus();
-				if (imm == null) {
-					imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-				}
-				imm.viewClicked(this);
-				imm.showSoftInput(this, 0);
+				showInput();
 			}
 		}
 	}
@@ -2505,7 +2492,7 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 			mAttr.paddingBottom = mBottom;
 			mAttr.paddingTop = mTop;
 		}
-		Log.e(TAG, ">>>>>>  "+mLeft+"   "+mRight);
+		Log.e(TAG, ">>>>>>  " + mLeft + "   " + mRight);
 		if (mAttr.paddingLeft != mLeft || mAttr.paddingRight != mRight) {
 			mAttr.paddingLeft = mLeft;
 			mAttr.paddingRight = mRight;
@@ -2802,13 +2789,12 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 			mHintLayout.clear();
 			mHintLayout = null;
 		}
-		if(mCursorHelper != null){
+		if (mCursorHelper != null) {
 			mCursorHelper = null;
 		}
-		imm = null;
 	}
 
-	private class ITextFilter implements InputFilter {
+	private class TextFilterProxy implements InputFilter {
 
 		@Override
 		public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
@@ -3005,7 +2991,7 @@ public class TextAreaView extends View implements TextAreaScroller, OnPreDrawLis
 
 		private int getPaddingLeft() {
 			if (mLeft != null) {
-				Log.e(TAG, "Left>"+mLeft.getBounds().width()+"   "+mCompoundPaddingLeft);
+				Log.e(TAG, "Left>" + mLeft.getBounds().width() + "   " + mCompoundPaddingLeft);
 				return mCompoundPaddingLeft + mLeft.getBounds().width();
 			}
 			return 0;
