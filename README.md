@@ -23,3 +23,11 @@
   
 由于TextView本身组件的复杂性,可能存在未知BUG,请谅解
 
+Last Repair BUG:
+
+1.ForamtLayout : Repair Measure Background Thread Died Lock.Current background Measure Line Infors will quick Finish.
+2.TextInputconnecter : Repair dispatchKeyEvent(KeyEvent e) Bug ,iteration dispatch as before,current Not occur this.
+3.TextAreaView :Repair init Cursor ,location offset bug.
+
+
+
