@@ -26,9 +26,9 @@
 -
 LastUpdate:
 -
-1. [ForamtLayout](/library/com/maizer/text/layout/FormatLayout.java): Repair Measure Background Thread Died Lock.Current background Measure Line Infors will quick Finish.
-2. [TextInputConnector](/library/com/maizer/text/util/TextInputConnector.java) : Repair dispatchKeyEvent(KeyEvent e) Bug ,iteration dispatch as before,current Not occur this.
-3. [TextAreaView](/library/com/maizer/text/view/TextAreaView.java) :Repair init Cursor ,location offset bug.
-4. [DefaultCursorDevicer](/library/com/maizer/text/cursor/DefaultCursor.java):Increase effect.imitate windows 2017 word cursor move effect
+1. [ForamtLayout](/library/com/maizer/text/layout/FormatLayout.java): 修复后台测量线程死锁BUG,现在将后台测量线程将很快完成测量
+2. [TextInputConnector](/library/com/maizer/text/util/TextInputConnector.java) : 修复dispatchKeyEvent()Bug,现在不会导致迭代分配
+3. [TextAreaView](/library/com/maizer/text/view/TextAreaView.java) :修复初始化Cursor位置偏移BUG
+4. [DefaultCursorDevicer](/library/com/maizer/text/cursor/DefaultCursor.java):增加效果,模仿Windows Word 2017 Cursor Offset Effect.
 
 
