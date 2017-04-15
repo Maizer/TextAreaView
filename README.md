@@ -27,7 +27,7 @@
 Last Repair BUG:
 -
 1. [ForamtLayout](/ibrary/com/maizer/text/layout/FormatLayout.java): Repair Measure Background Thread Died Lock.Current background Measure Line Infors will quick Finish.
-2.[TextInputConnector](/library/com/maizer/text/util/TextInputConnector.java) : Repair dispatchKeyEvent(KeyEvent e) Bug ,iteration dispatch as before,current Not occur this.
-3.[TextAreaView](/library/com/maizer/text/view/TextAreaView.java) :Repair init Cursor ,location offset bug.
+2. [TextInputConnector](/library/com/maizer/text/util/TextInputConnector.java) : Repair dispatchKeyEvent(KeyEvent e) Bug ,iteration dispatch as before,current Not occur this.
+3. [TextAreaView](/library/com/maizer/text/view/TextAreaView.java) :Repair init Cursor ,location offset bug.
 
 
